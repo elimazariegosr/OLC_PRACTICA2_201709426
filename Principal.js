@@ -450,60 +450,64 @@ var Sintact = /** @class */ (function () {
     };
     Sintact.prototype.sentencias = function (num1, num2, tab) {
         var analizado = false;
-        if (lista_token[index].id_token == 820 || lista_token[index].id_token == 821) {
-            var coment = lista_token[index].lexema;
-            coment = coment.replace("//", "#");
-            coment = coment.replace("/*", "'''");
-            coment = coment.replace("*/", "'''");
-            texto_py = texto_py + coment;
-            analizado = true;
-            this.consumir();
-        }
-        else {
-            if (lista_token[index].id_token == 807) {
-                analizado = this.sentencia_imprimir(tab);
-            }
-            else if (lista_token[index].id_token == 809) {
-                analizado = this.sentencia_if(tab, 0);
-            }
-            else if (lista_token[index].id_token == 811) {
-                analizado = this.sentencia_swtich(tab);
-            }
-            else if (lista_token[index].id_token == 812) {
-                analizado = this.sentencia_for(tab);
-            }
-            else if (lista_token[index].id_token == 813) {
-                analizado = this.sentencia_while(tab);
-            }
-            else if (lista_token[index].id_token == 814) {
-                analizado = this.sentencia_do_while(tab);
-            }
-            else if (this.es_tipo_de_dato()) {
-                analizado = this.declaracion_variable(tab);
-            }
-            else if (lista_token[index].id_token == 818) {
-                if (lista_token[index + 1].id_token == 61) {
-                    analizado = this.sentencia_variable_val(tab);
-                }
-                else if (lista_token[index + 1].id_token = 40) {
-                    analizado = this.llamada_metodo(tab);
-                }
-            }
-            else if (lista_token[index].id_token == 815) {
-                analizado = this.sentencia_return(tab);
-            }
-            else if (lista_token[index].id_token == 816) {
-                analizado = this.sentencia_break(tab);
-            }
-            else if (lista_token[index].id_token == 817) {
-                analizado = this.sentencia_continue(tab);
+        try {
+            if (lista_token[index].id_token == 820 || lista_token[index].id_token == 821) {
+                var coment = lista_token[index].lexema;
+                coment = coment.replace("//", "#");
+                coment = coment.replace("/*", "'''");
+                coment = coment.replace("*/", "'''");
+                texto_py = texto_py + coment;
+                analizado = true;
+                this.consumir();
             }
             else {
-                this.capturar_error("Sintaxis dentro de metodo");
+                if (lista_token[index].id_token == 807) {
+                    analizado = this.sentencia_imprimir(tab);
+                }
+                else if (lista_token[index].id_token == 809) {
+                    analizado = this.sentencia_if(tab, 0);
+                }
+                else if (lista_token[index].id_token == 811) {
+                    analizado = this.sentencia_swtich(tab);
+                }
+                else if (lista_token[index].id_token == 812) {
+                    analizado = this.sentencia_for(tab);
+                }
+                else if (lista_token[index].id_token == 813) {
+                    analizado = this.sentencia_while(tab);
+                }
+                else if (lista_token[index].id_token == 814) {
+                    analizado = this.sentencia_do_while(tab);
+                }
+                else if (this.es_tipo_de_dato()) {
+                    analizado = this.declaracion_variable(tab);
+                }
+                else if (lista_token[index].id_token == 818) {
+                    if (lista_token[index + 1].id_token == 61) {
+                        analizado = this.sentencia_variable_val(tab);
+                    }
+                    else if (lista_token[index + 1].id_token = 40) {
+                        analizado = this.llamada_metodo(tab);
+                    }
+                }
+                else if (lista_token[index].id_token == 815) {
+                    analizado = this.sentencia_return(tab);
+                }
+                else if (lista_token[index].id_token == 816) {
+                    analizado = this.sentencia_break(tab);
+                }
+                else if (lista_token[index].id_token == 817) {
+                    analizado = this.sentencia_continue(tab);
+                }
+                else {
+                    this.capturar_error("Sintaxis dentro de metodo");
+                }
+                if (!analizado) {
+                    analizado = this.mode_panik(num1, num2);
+                }
             }
-            if (!analizado) {
-                analizado = this.mode_panik(num1, num2);
-            }
+        }
+        catch (error) {
         }
         return analizado;
     };
@@ -812,6 +816,9 @@ var Sintact = /** @class */ (function () {
             if (!val) {
                 return false;
             }
+            if (index >= lista_token.length) {
+                return false;
+            }
         }
         if (lista_token[index].id_token == 125) {
             this.consumir();
@@ -840,7 +847,10 @@ var Sintact = /** @class */ (function () {
             return false;
         }
         while (lista_token[index].id_token != 41) { // != cerrar parentesis
-            this.validacion_logica();
+            var val = this.validacion_logica();
+            if (!val) {
+                return false;
+            }
         }
         if (lista_token[index].id_token == 41) {
             this.consumir();
@@ -861,6 +871,9 @@ var Sintact = /** @class */ (function () {
             ///sentencias
             var val = this.sentencias(59, 125, tab + "\t");
             if (!val) {
+                return false;
+            }
+            if (index >= lista_token.length) {
                 return false;
             }
         }
@@ -896,6 +909,9 @@ var Sintact = /** @class */ (function () {
             if (!val) {
                 return false;
             }
+            if (index >= lista_token.length) {
+                return false;
+            }
         }
         if (lista_token[index].id_token == 125) { /// cerrar llaves
             this.consumir();
@@ -920,7 +936,10 @@ var Sintact = /** @class */ (function () {
         }
         texto_py = texto_py + "\n" + tab + "if(";
         while (lista_token[index].id_token != 41) {
-            this.validacion_logica();
+            var val = this.validacion_logica();
+            if (!val) {
+                return false;
+            }
         }
         texto_py = texto_py + "):\n" + tab + "\tbreak";
         if (lista_token[index].id_token == 41) {
@@ -1013,6 +1032,9 @@ var Sintact = /** @class */ (function () {
                     // sentencias
                     var val = this.sentencias(59, 125, tab + "\t\t");
                     if (!val) {
+                        return false;
+                    }
+                    if (index >= lista_token.length) {
                         return false;
                     }
                     texto_py = texto_py + ",";
@@ -1144,7 +1166,10 @@ var Sintact = /** @class */ (function () {
         }
         while (lista_token[index].id_token != 41) { // != cerrar parentesis
             //o
-            this.validacion_logica();
+            var val = this.validacion_logica();
+            if (!val) {
+                return false;
+            }
         }
         if (lista_token[index].id_token = 41) { // cerrar parentesis
             this.consumir();
@@ -1167,6 +1192,9 @@ var Sintact = /** @class */ (function () {
             if (!val) {
                 return false;
             }
+            if (index >= lista_token.length) {
+                return false;
+            }
             //sentencias
         }
         if (lista_token[index].id_token == 125) { // cerrar llave
@@ -1187,6 +1215,9 @@ var Sintact = /** @class */ (function () {
                         //sentencias
                         var val = this.sentencias(59, 125, tab + "\t");
                         if (!val) {
+                            return false;
+                        }
+                        if (index >= lista_token.length) {
                             return false;
                         }
                         //sentencias
@@ -1295,6 +1326,9 @@ var Sintact = /** @class */ (function () {
             // sentencias
             var val = this.sentencias(59, 125, tab + "\t");
             if (!val) {
+                return false;
+            }
+            if (index >= lista_token.length) {
                 return false;
             }
         }

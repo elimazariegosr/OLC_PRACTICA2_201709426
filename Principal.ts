@@ -469,49 +469,53 @@ class Sintact {
     }
     sentencias(num1:number, num2:number, tab:string):boolean{
         let analizado:boolean = false;
-        if(lista_token[index].id_token == 820 || lista_token[index].id_token ==821){
-            let coment = lista_token[index].lexema;
-            coment = coment.replace("//","#");
-            coment = coment.replace("/*","'''");
-            coment = coment.replace("*/","'''");
-            texto_py = texto_py  + coment;
-            analizado = true;
-            this.consumir();
-        }else{
-            if(lista_token[index].id_token  == 807){
-                analizado = this.sentencia_imprimir(tab);    
-            }else if(lista_token[index].id_token == 809){
-                analizado = this.sentencia_if(tab,0);
-            }else if(lista_token[index].id_token == 811){
-                analizado = this.sentencia_swtich(tab);
-            }else if(lista_token[index].id_token == 812){
-                analizado = this.sentencia_for(tab);
-            }else if(lista_token[index].id_token == 813){
-                analizado = this.sentencia_while(tab);
-            }else if(lista_token[index].id_token == 814){
-                analizado = this.sentencia_do_while(tab);
-            }else if(this.es_tipo_de_dato()){
-                analizado = this.declaracion_variable(tab);
-            }else if(lista_token[index].id_token == 818){
-                if(lista_token[index + 1].id_token == 61){
-                    analizado = this.sentencia_variable_val(tab);
-                }else if(lista_token[index + 1].id_token = 40){
-                    analizado = this.llamada_metodo(tab);
-                }
-            }else if(lista_token[index].id_token == 815){
-                analizado = this.sentencia_return(tab);
-            }else if(lista_token[index].id_token == 816){
-                analizado = this.sentencia_break(tab);
-            }else if(lista_token[index].id_token == 817){
-                analizado = this.sentencia_continue(tab);
+        try{
+            if(lista_token[index].id_token == 820 || lista_token[index].id_token ==821){
+                let coment = lista_token[index].lexema;
+                coment = coment.replace("//","#");
+                coment = coment.replace("/*","'''");
+                coment = coment.replace("*/","'''");
+                texto_py = texto_py  + coment;
+                analizado = true;
+                this.consumir();
             }else{
-                this.capturar_error("Sintaxis dentro de metodo");
+                if(lista_token[index].id_token  == 807){
+                    analizado = this.sentencia_imprimir(tab);    
+                }else if(lista_token[index].id_token == 809){
+                    analizado = this.sentencia_if(tab,0);
+                }else if(lista_token[index].id_token == 811){
+                    analizado = this.sentencia_swtich(tab);
+                }else if(lista_token[index].id_token == 812){
+                    analizado = this.sentencia_for(tab);
+                }else if(lista_token[index].id_token == 813){
+                    analizado = this.sentencia_while(tab);
+                }else if(lista_token[index].id_token == 814){
+                    analizado = this.sentencia_do_while(tab);
+                }else if(this.es_tipo_de_dato()){
+                    analizado = this.declaracion_variable(tab);
+                }else if(lista_token[index].id_token == 818){
+                    if(lista_token[index + 1].id_token == 61){
+                        analizado = this.sentencia_variable_val(tab);
+                    }else if(lista_token[index + 1].id_token = 40){
+                        analizado = this.llamada_metodo(tab);
+                    }
+                }else if(lista_token[index].id_token == 815){
+                    analizado = this.sentencia_return(tab);
+                }else if(lista_token[index].id_token == 816){
+                    analizado = this.sentencia_break(tab);
+                }else if(lista_token[index].id_token == 817){
+                    analizado = this.sentencia_continue(tab);
+                }else{
+                    this.capturar_error("Sintaxis dentro de metodo");
+                }
+                if(!analizado){
+                    analizado = this.mode_panik(num1,num2);
+                }
             }
-    
-            if(!analizado){
-                analizado = this.mode_panik(num1,num2);
-            }
+        }catch(error){
+
         }
+        
         
         return analizado; 
     }
@@ -791,6 +795,9 @@ class Sintact {
             if(!val){
                 return false;
             }
+            if(index>= lista_token.length){
+                return false;
+            }
         }
         if(lista_token[index].id_token == 125){
             this.consumir();
@@ -816,7 +823,11 @@ class Sintact {
             return false;
         }
         while(lista_token[index].id_token != 41){// != cerrar parentesis
-            this.validacion_logica();
+
+            let val = this.validacion_logica();
+            if(!val){
+                return false;
+            }
         }
         if(lista_token[index].id_token == 41){
             this.consumir();
@@ -835,6 +846,10 @@ class Sintact {
             ///sentencias
             let val = this.sentencias(59,125,tab + "\t");
             if(!val){
+                return false;
+            }
+            
+            if(index>= lista_token.length){
                 return false;
             }
         }
@@ -867,6 +882,10 @@ class Sintact {
             if(!val){
                 return false;
             }
+            
+            if(index>= lista_token.length){
+                return false;
+            }
 
         }
         if(lista_token[index].id_token == 125){/// cerrar llaves
@@ -889,7 +908,11 @@ class Sintact {
         }
         texto_py = texto_py + "\n"+ tab + "if(";
         while(lista_token[index].id_token != 41){
-            this.validacion_logica();
+            
+            let val = this.validacion_logica();
+            if(!val){
+                return false;
+            }
         }
         texto_py = texto_py + "):\n" + tab + "\tbreak";
         if(lista_token[index].id_token == 41){
@@ -978,6 +1001,10 @@ class Sintact {
                         if(!val){
                             return false;
                         }
+                        
+            if(index>= lista_token.length){
+                return false;
+            }
                     texto_py = texto_py + ",";    
                 }
                 if(lista_token[index].id_token == 815 || lista_token[index].id_token == 816){
@@ -1097,7 +1124,10 @@ class Sintact {
 
         while(lista_token[index].id_token != 41){// != cerrar parentesis
             //o
-            this.validacion_logica();
+            let val = this.validacion_logica();
+            if(!val){
+                return false;
+            }
         }
         if(lista_token[index].id_token = 41){// cerrar parentesis
             this.consumir();
@@ -1117,6 +1147,10 @@ class Sintact {
             // sentencias
             let val = this.sentencias(59,125,tab + "\t");
             if(!val){
+                return false;
+            }
+            
+            if(index>= lista_token.length){
                 return false;
             }
             //sentencias
@@ -1140,6 +1174,10 @@ class Sintact {
                         if(!val){
                             return false;
                         } 
+                        
+            if(index>= lista_token.length){
+                return false;
+            }
 
                         //sentencias
                     }
@@ -1234,6 +1272,10 @@ class Sintact {
             // sentencias
             let val = this.sentencias(59,125,tab+ "\t");
             if(!val){
+                return false;
+            }
+            
+            if(index>= lista_token.length){
                 return false;
             }
             
