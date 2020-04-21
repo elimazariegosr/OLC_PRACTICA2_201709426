@@ -1340,7 +1340,7 @@ class Sintact {
                     }
                 }
                 if(lista_token[index].id_token == 44){
-                    texto_py = texto_py + " " + lista_token[index].lexema;
+                    texto_py = texto_py + "\n" +tab ;
                     this.consumir();
                 }else if(lista_token[index].id_token == 59){
                     break;
@@ -1349,7 +1349,7 @@ class Sintact {
                     return false;
                 }
             }else if(lista_token[index].id_token == 44){// es coma                
-                texto_py = texto_py + " " + lista_token[index].lexema;
+                texto_py =  texto_py + "=None" + "\n" +tab ;
                 this.consumir();
             }else{
               if(!this.es_identificador() && lista_token[index].id_token != 59){
